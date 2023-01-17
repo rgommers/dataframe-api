@@ -31,12 +31,12 @@ jobs:
 
       - name: 'Commit and push build to deploy repo'
         run: |
-          git clone git@github.com:data-apis/dataframe-protocol.git deploy-repo
+          git clone https://github.com/data-apis/dataframe-protocol.git deploy-repo
           cd deploy-repo
           (git checkout --orphan tmp && git branch -D main || true)
           git checkout --orphan main
           git reset --hard
-          cp -R ../protocol/_build/ latest
+          cp -R ../_build/ latest
           touch .nojekyll
           git config --local user.email "noreply@data-apis.org"
           git config --local user.name "dataframe-protocol-bot"
