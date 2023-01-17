@@ -4,13 +4,14 @@ on:
   push:
     branches:
       - main
+      - deploy-protocol-docs
 
 jobs:
   publish:
     name: 'Publish'
     runs-on: ubuntu-latest
     # Avoid running this workflow for forks:
-    if: "github.repository == 'data-apis/dataframe-api'"
+    #if: "github.repository == 'data-apis/dataframe-api'"
     steps:
       - name: 'Checkout repository'
         uses: actions/checkout@v3
