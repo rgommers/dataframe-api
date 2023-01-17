@@ -1,0 +1,46 @@
+name: Deploy protocol docs
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    name: 'Publish'
+    runs-on: ubuntu-latest
+    # Avoid running this workflow for forks:
+    if: "github.repository == 'data-apis/dataframe-api'"
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v3
+
+      - name: 'Install Python'
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: 'Install dependencies'
+        run: pip install -r ./requirements.txt
+
+      - name: 'Build documentation'
+        run: |
+          # Turn warnings into errors and ensure .doctrees is not deployed:
+          sphinx-build -b html -WT --keep-going protocol/ _build -d doctrees
+
+      - name: 'Commit and push build to deploy repo'
+        run: |
+          git clone git@github.com:data-apis/dataframe-protocol.git deploy-repo
+          cd deploy-repo
+          (git checkout --orphan tmp && git branch -D main || true)
+          git checkout --orphan main
+          git reset --hard
+          cp -R ../protocol/_build/ latest
+          touch .nojekyll
+          git config --local user.email "noreply@data-apis.org"
+          git config --local user.name "dataframe-protocol-bot"
+          git config --global push.default simple
+          git add . > /dev/null
+          git commit -m "Protocol docs build for ${GITHUB_SHA}"
+          #git push --set-upstream origin gh-pages --force
+
