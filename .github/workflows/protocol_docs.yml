@@ -43,5 +43,5 @@ jobs:
           git config --global push.default simple
           git add . > /dev/null
           git commit -m "Protocol docs build for ${GITHUB_SHA}"
-          #git push --set-upstream origin gh-pages --force
+          git push --set-upstream origin main --force
 
