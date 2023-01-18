@@ -38,10 +38,16 @@ jobs:
           git reset --hard
           cp -R ../_build/ latest
           touch .nojekyll
-          git config --local user.email "noreply@data-apis.org"
-          git config --local user.name "dataframe-protocol-bot"
-          git config --global push.default simple
-          git add . > /dev/null
+          git add .
           git commit -m "Protocol docs build for ${GITHUB_SHA}"
-          git push --set-upstream origin main --force
 
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          personal_token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
+          external_repository: data-apis/dataframe-protocol
+          publish_branch: main
+          publish_dir: .
+          user_name: 'github-actions[bot]'
+          user_email: 'github-actions[bot]@users.noreply.github.com'
