@@ -27,27 +27,18 @@ jobs:
       - name: 'Build documentation'
         run: |
           # Turn warnings into errors and ensure .doctrees is not deployed:
-          sphinx-build -b html -WT --keep-going protocol/ _build -d doctrees
+          mkdir site
+          sphinx-build -b html -WT --keep-going protocol/ site/latest -d doctrees
+          touch site/.nojekyll
 
-      - name: 'Commit and push build to deploy repo'
-        run: |
-          git clone https://github.com/data-apis/dataframe-protocol.git deploy-repo
-          cd deploy-repo
-          (git checkout --orphan tmp && git branch -D main || true)
-          git checkout --orphan main
-          git reset --hard
-          cp -R ../_build/ latest
-          touch .nojekyll
-          git add .
-          git commit -m "Protocol docs build for ${GITHUB_SHA}"
 
-      - name: Deploy
+      - name: 'Deploy'
         uses: peaceiris/actions-gh-pages@v3
         #if: github.ref == 'refs/heads/main'
         with:
           personal_token: ${{ secrets.ACTIONS_DEPLOY_TOKEN }}
           external_repository: data-apis/dataframe-protocol
           publish_branch: main
-          publish_dir: .
+          publish_dir: ./site
           user_name: 'github-actions[bot]'
           user_email: 'github-actions[bot]@users.noreply.github.com'
